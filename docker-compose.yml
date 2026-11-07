@@ -1,0 +1,75 @@
+name: ids-lab
+
+networks:
+  lab:            # isolated attack network (trust boundary)
+    internal: true
+  dash:           # only used to reach EveBox from the host browser
+
+volumes:
+  suricata-logs:
+  response:       # shared by the responder (writes) and the attack panel (reads)
+
+services:
+  target:
+    build: ./target            # nginx + openssh-server, fake account "labuser"
+    networks: [lab]
+    volumes:
+      - ./target/site:/var/www/html:ro   # CedarShop demo website (fictional store)
+    # no published ports; only reachable from inside the lab
+
+  suricata:
+    image: jasonish/suricata:7.0.17
+    network_mode: "service:target"     # sees all packets to/from the target
+    cap_add: [NET_ADMIN, NET_RAW, SYS_NICE]
+    command: -i eth0 -c /etc/suricata/suricata.yaml
+    volumes:
+      - ./suricata/suricata.yaml:/etc/suricata/suricata.yaml
+      - ./suricata/rules:/var/lib/suricata/rules
+      - suricata-logs:/var/log/suricata
+    depends_on: [target]
+
+  responder:
+    build: ./responder
+    # Automatic response (IDS + action, like fail2ban): when Suricata raises one
+    # of BLOCK_SIDS, this adds a firewall rule on the target that drops all
+    # traffic from that machine for a short time. Suricata itself still only detects.
+    network_mode: "service:target"
+    cap_add: [NET_ADMIN, NET_RAW]
+    environment:
+      # Starting settings; they can be changed live in the attack panel.
+      BLOCK_SIDS: "1000001 1000002 1000003 1000004 1000005 1000006 1000007"
+      BLOCK_SECONDS: "20"          # auto-unblock after 20 s (0 = until unblocked)
+    volumes:
+      - suricata-logs:/var/log/suricata:ro
+      - response:/response
+    depends_on: [target, suricata]
+
+  attacker:
+    build: ./attacker          # kali-rolling + nmap, hping3, scapy, hydra
+    # lab = attack traffic. dash is only so the browser can open the attack
+    # panel; the port is published on 127.0.0.1, so only this laptop can reach it.
+    networks: [lab, dash]
+    ports: ["127.0.0.1:8080:8080"]
+    cap_add: [NET_RAW, NET_ADMIN]
+    volumes:
+      - ./attacker/scripts:/scripts:ro
+      - ./attacker/wordlist.txt:/wordlist.txt:ro
+      - ./attacker/panel:/panel:ro                 # attack panel web page
+      - suricata-logs:/var/log/suricata:ro         # panel reads alerts from eve.json
+      - response:/response                         # panel reads the defender's blocks
+    # Runs the attack panel (python3 standard library only). The container stays
+    # up as before, so `docker compose exec attacker /scripts/...` still works.
+    command: python3 /panel/app.py
+
+  benign:
+    build: ./benign            # curl + ssh client loop
+    networks: [lab]
+    depends_on: [target]
+
+  evebox:
+    image: jasonish/evebox:0.31.0
+    networks: [dash]
+    ports: ["5636:5636"]
+    volumes:
+      - suricata-logs:/var/log/suricata:ro
+    command: -D /var/lib/evebox server --sqlite --no-auth --no-tls --host 0.0.0.0 --input /var/log/suricata/eve.json --end

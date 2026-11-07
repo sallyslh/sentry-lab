@@ -1,0 +1,53 @@
+%YAML 1.1
+---
+# Minimal Suricata config for the IDS lab.
+# Suricata runs with network_mode: service:target, so it watches the
+# target container's own eth0 interface directly (no port mirroring needed).
+
+vars:
+  address-groups:
+    # Covers the private-IP ranges Docker's default bridge driver assigns,
+    # since the lab network's exact subnet is picked automatically.
+    HOME_NET: "[172.16.0.0/12,192.168.0.0/16,10.0.0.0/8]"
+    TARGET: "[172.16.0.0/12,192.168.0.0/16,10.0.0.0/8]"
+    EXTERNAL_NET: "any"
+  port-groups:
+    HTTP_PORTS: "80"
+    SSH_PORTS: "22"
+
+default-rule-path: /var/lib/suricata/rules
+rule-files:
+  - local.rules
+
+af-packet:
+  - interface: eth0
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    tpacket-v3: yes
+    ring-size: 4096
+    buffer-size: 65536
+
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert:
+            payload: no
+            packet: no
+            metadata: yes
+        - flow
+        - stats:
+            totals: yes
+            threads: no
+
+logging:
+  default-log-level: notice
+  outputs:
+    - console:
+        enabled: yes
+    - file:
+        enabled: yes
+        filename: suricata.log

@@ -1,0 +1,384 @@
+=== Scenario 1 (port scan) run 1: 2026-10-28T16:09:23Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:09 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000011s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 3.94 seconds
+=== end run 1 ===
+=== Scenario 1 (port scan) run 2: 2026-10-28T16:09:48Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:09 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000014s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.05 seconds
+=== end run 2 ===
+=== Scenario 1 (port scan) run 3: 2026-10-28T16:10:09Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:10 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000019s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.36 seconds
+=== end run 3 ===
+=== Scenario 1 (port scan) run 4: 2026-10-28T16:10:31Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:10 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000017s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.43 seconds
+=== end run 4 ===
+=== Scenario 1 (port scan) run 5: 2026-10-28T16:10:51Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:10 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000013s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.33 seconds
+=== end run 5 ===
+=== Scenario 2 (SSH brute force) run 1: 2026-10-28T16:11:12Z ===
+Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2026-10-28 16:11:13
+[DATA] max 4 tasks per 1 server, overall 4 tasks, 20 login tries (l:1/p:20), ~5 tries per task
+[DATA] attacking ssh://target:22/
+[22][ssh] host: target   misc: (null)   login: labuser   password: labpass123
+[STATUS] attack finished for target (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-10-28 16:11:24
+=== end run 1 ===
+=== Scenario 2 (SSH brute force) run 2: 2026-10-28T16:11:44Z ===
+Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2026-10-28 16:11:44
+[DATA] max 4 tasks per 1 server, overall 4 tasks, 20 login tries (l:1/p:20), ~5 tries per task
+[DATA] attacking ssh://target:22/
+[22][ssh] host: target   misc: (null)   login: labuser   password: labpass123
+[STATUS] attack finished for target (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-10-28 16:11:57
+=== end run 2 ===
+=== Scenario 2 (SSH brute force) run 3: 2026-10-28T16:12:17Z ===
+Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2026-10-28 16:12:17
+[DATA] max 4 tasks per 1 server, overall 4 tasks, 20 login tries (l:1/p:20), ~5 tries per task
+[DATA] attacking ssh://target:22/
+[22][ssh] host: target   misc: (null)   login: labuser   password: labpass123
+[STATUS] attack finished for target (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-10-28 16:12:30
+=== end run 3 ===
+=== Scenario 2 (SSH brute force) run 4: 2026-10-28T16:12:50Z ===
+Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2026-10-28 16:12:50
+[DATA] max 4 tasks per 1 server, overall 4 tasks, 20 login tries (l:1/p:20), ~5 tries per task
+[DATA] attacking ssh://target:22/
+[22][ssh] host: target   misc: (null)   login: labuser   password: labpass123
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-10-28 16:13:02
+=== end run 4 ===
+=== Scenario 2 (SSH brute force) run 5: 2026-10-28T16:13:22Z ===
+Hydra v9.7 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2026-10-28 16:13:22
+[DATA] max 4 tasks per 1 server, overall 4 tasks, 20 login tries (l:1/p:20), ~5 tries per task
+[DATA] attacking ssh://target:22/
+[22][ssh] host: target   misc: (null)   login: labuser   password: labpass123
+[STATUS] attack finished for target (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-10-28 16:13:35
+=== end run 5 ===
+=== Scenario 3 (malformed packets) run 1: 2026-10-28T16:13:55Z ===
+-- NULL scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:13 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00015s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.58 seconds
+-- Xmas scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:13 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00024s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.03 seconds
+=== end run 1 ===
+=== Scenario 3 (malformed packets) run 2: 2026-10-28T16:14:19Z ===
+-- NULL scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:14 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00012s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.49 seconds
+-- Xmas scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:14 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00022s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.01 seconds
+=== end run 2 ===
+=== Scenario 3 (malformed packets) run 3: 2026-10-28T16:14:42Z ===
+-- NULL scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:14 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00014s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.00 seconds
+-- Xmas scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:14 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00013s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.01 seconds
+=== end run 3 ===
+=== Scenario 3 (malformed packets) run 4: 2026-10-28T16:15:07Z ===
+-- NULL scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:15 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00015s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.49 seconds
+-- Xmas scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:15 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00045s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.50 seconds
+=== end run 4 ===
+=== Scenario 3 (malformed packets) run 5: 2026-10-28T16:15:30Z ===
+-- NULL scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:15 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000044s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.47 seconds
+-- Xmas scan --
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:15 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.000031s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+Not shown: 98 closed tcp ports (reset)
+PORT   STATE         SERVICE
+22/tcp open|filtered ssh
+80/tcp open|filtered http
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.99 seconds
+=== end run 5 ===
+=== Evasion test (slow+fragmented scan) run 1: 2026-10-28T16:15:53Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:15 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.0015s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.94 seconds
+=== end run 1 ===
+=== Evasion test (slow+fragmented scan) run 2: 2026-10-28T16:20:29Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:20 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00095s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.55 seconds
+=== end run 2 ===
+=== Evasion test (slow+fragmented scan) run 3: 2026-10-28T16:25:05Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:25 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00074s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.92 seconds
+=== end run 3 ===
+=== Evasion test (slow+fragmented scan) run 4: 2026-10-28T16:29:41Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:29 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.0010s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.42 seconds
+=== end run 4 ===
+=== Evasion test (slow+fragmented scan) run 5: 2026-10-28T16:34:17Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 16:34 +0000
+Nmap scan report for target (172.31.0.2)
+Host is up (0.00075s latency).
+rDNS record for 172.31.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1F:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.98 seconds
+=== end run 5 ===
+=== Scenario 4 (large outbound transfer) run 1: 2026-10-28T16:38:53Z ===
+Warning: Permanently added 'target' (ED25519) to the list of known hosts.
+=== end run 1 ===
+All scenarios complete. Now run the alert-counting script on the host:
+  python analysis/count_alerts.py

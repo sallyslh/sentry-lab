@@ -1,0 +1,8 @@
+scenario,alert_count,distinct_src_ips,false_alarms
+Rule 5: HTTP rate (sensitivity test),6,2,1
+Rule 6: Low-and-slow scan (evasion companion rule),6,1,0
+Rule 7: Bulk transfer detection (exfiltration fix),10,2,0
+Scenario 1: Port scan (SYN),5,1,0
+Scenario 2: SSH brute force,5,1,0
+Scenario 3: Malformed (NULL scan),510,1,0
+Scenario 3: Malformed (Xmas scan),510,1,0

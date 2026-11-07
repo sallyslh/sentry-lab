@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suricata Attack Panel</title>
+<style>
+:root{--navy:#1F3A5F;--red:#B3261E;--red-bg:#FDECEA;--orange:#B4570F;--orange-bg:#FFF2E5;--green:#1E7B4A;--green-bg:#E7F5EC;
+--ink:#1D2433;--muted:#5F6B7A;--line:#DCE1E8;--bg:#F4F6F9;--card:#fff;--term:#0E1420}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Calibri,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:var(--navy);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+header h1{margin:0;font-size:23px;font-weight:600}header p{margin:3px 0 0;font-size:13.5px;color:#C9D4E3}
+.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);padding:7px 13px;border-radius:999px;font-size:13.5px}
+.dot{width:10px;height:10px;border-radius:50%;background:#9AA5B4}.dot.on{background:#43D17A;box-shadow:0 0 0 4px rgba(67,209,122,.25)}
+.story{display:flex;align-items:stretch;gap:0;padding:14px 28px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto}
+.step{flex:1;min-width:170px;display:flex;align-items:center;gap:12px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:#FAFBFC;transition:all .3s}
+.step .n{width:30px;height:30px;border-radius:50%;background:#E8EEF6;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.step b{display:block;font-size:15px}.step span{font-size:12.5px;color:var(--muted)}
+.step.hit{border-color:var(--red);background:var(--red-bg)}.step.hit .n{background:var(--red);color:#fff}.step.hit span{color:var(--red);font-weight:600}
+.arrow{align-self:center;color:#9AA5B4;font-size:22px;padding:0 8px}
+main{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:22px;padding:20px 28px;max-width:1560px;margin:0 auto}
+@media(max-width:1050px){main{grid-template-columns:1fr}}
+h2{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card h3{margin:0 0 4px;font-size:19px}.sub{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.5}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:#E8EEF6;color:var(--navy);border:0;border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.tab.on{background:var(--navy);color:#fff}.tab small{opacity:.7;font-weight:500}
+.pane{display:none}.pane.on{display:block}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px}
+button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:var(--navy);color:#fff}
+button.ghost{background:#EEF2F7;color:var(--navy);font-weight:500}button.red{background:var(--red)}
+button.chip{background:#EEF2F7;color:var(--ink);font-weight:500;padding:5px 10px;font-size:13px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.note{font-size:13px;color:var(--muted);line-height:1.5}
+/* browser */
+.browser{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.bbar{display:flex;align-items:center;gap:8px;background:#EEF1F5;padding:8px 10px;border-bottom:1px solid var(--line)}
+.bbar .dots i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;background:#D5DAE1}
+.addr{flex:1;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13.5px;color:var(--muted)}
+.bbar button{padding:6px 11px;font-size:13px}
+iframe{width:100%;height:470px;border:0;background:#fff;display:block}
+/* scanner */
+.ports{display:grid;grid-template-columns:repeat(50,1fr);gap:2px;margin-top:12px}
+.ports i{aspect-ratio:1;background:#E6EAF0;border-radius:2px}.ports i.c{background:#A9B3C1}.ports i.x{background:#7A1F2B}.ports i.o{background:#1E7B4A;outline:2px solid #7FD3A6}
+.ports.slow{grid-template-columns:repeat(15,1fr)}.ports.slow i{border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:600}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-top:10px;flex-wrap:wrap}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+/* packet */
+.tcp{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0 12px}
+.flag{border:2px solid var(--line);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;background:#fff;user-select:none}
+.flag b{display:block;font-size:18px}.flag span{font-size:12px;color:var(--muted)}
+.flag.on{border-color:var(--navy);background:var(--navy);color:#fff}.flag.on span{color:#C9D4E3}
+.verdict{border-radius:10px;padding:12px 14px;font-size:14px;margin-top:4px}
+.verdict.ok{background:var(--green-bg);color:var(--green)}.verdict.bad{background:var(--red-bg);color:var(--red)}.verdict.mid{background:#EEF2F7;color:var(--navy)}
+/* terminal */
+.term{background:var(--term);color:#D7E0EC;border-radius:12px;padding:14px 16px;font-family:Consolas,Menlo,monospace;font-size:13.5px;height:300px;overflow:auto}
+.term .l{white-space:pre-wrap;line-height:1.5}.term .err{color:#FF8A80}.term .ok{color:#7FE0A6}.term .dim{color:#7C8899}
+.term .in{display:flex;align-items:center;gap:6px}.term input{flex:1;background:transparent;border:0;color:#fff;font:inherit;padding:2px;outline:none}
+.prompt{color:#7FE0A6}
+.files{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:none}
+.file{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:#F7F8FA}
+.file .ic{width:38px;height:44px;border-radius:6px;background:#7A1F2B;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px}
+.prog{height:14px;background:#EEF2F7;border-radius:999px;overflow:hidden;margin-top:10px;position:relative}
+.prog i{display:block;height:100%;width:0;background:var(--navy);transition:width .2s}.prog .mk{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--red);left:5%}
+/* flood */
+.bars{display:flex;align-items:flex-end;gap:6px;height:150px;margin-top:14px;border-bottom:1px solid var(--line)}
+.bars div{flex:1;background:var(--navy);border-radius:4px 4px 0 0;min-height:3px;position:relative}.bars div span{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:11px;color:var(--muted)}
+input[type=range]{width:260px;padding:0}
+/* scripts */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.atk{border:1px solid var(--line);border-radius:10px;padding:12px;background:#FAFBFC;display:flex;flex-direction:column;gap:5px}
+.atk b{font-size:14.5px}.atk span{font-size:12.5px;color:var(--muted);line-height:1.4}.atk button{margin-top:auto;align-self:flex-start;padding:7px 13px}
+.tag{font-size:11.5px;font-weight:600;color:var(--navy);background:#E8EEF6;border-radius:6px;padding:2px 8px;align-self:flex-start}
+pre{background:var(--term);color:#D7E0EC;border-radius:10px;padding:12px 14px;font-size:12.5px;height:180px;overflow:auto;margin:12px 0 0;white-space:pre-wrap}
+/* right column */
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#F4F6F9;border-radius:10px;padding:11px}.stat .n{font-size:22px;font-weight:700}.stat .t{font-size:12px;color:var(--muted)}.stat.bad .n{color:var(--red)}
+.meter{margin-top:11px}.meter .lbl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px}.meter .lbl b{color:var(--ink)}
+.bar{height:10px;background:#EEF2F7;border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--navy);transition:width .3s}
+.bar i.hot{background:var(--orange)}.bar i.full{background:var(--red)}
+.feed{display:flex;flex-direction:column;gap:9px;max-height:calc(100vh - 470px);min-height:260px;overflow:auto}
+.al{border-radius:10px;padding:11px 13px;border:1px solid var(--line);background:#fff;animation:pop .35s ease}
+.al.you{border-color:#F0B8B3;background:var(--red-bg)}.al.normal{border-color:#F3CFA8;background:var(--orange-bg)}
+.al .top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}.al .name{font-size:15.5px;font-weight:700;margin:2px 0}.al .why{font-size:13px;line-height:1.4}
+.badge{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;color:#fff;background:var(--red)}.badge.n{background:var(--orange)}.badge.o{background:#6B7685}
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:26px 10px;border:1px dashed var(--line);border-radius:10px}
+@keyframes pop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
+#caught{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,23,36,.45);z-index:10}
+#caught.show{display:flex;animation:pop .25s ease}
+#caught .box{background:#fff;border-radius:16px;padding:28px 40px;max-width:580px;text-align:center;border-top:10px solid var(--red);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#caught .big{font-size:38px;font-weight:800;color:var(--red)}#caught .r{font-size:22px;font-weight:700;margin:10px 0 6px}#caught .w{font-size:16px;color:var(--muted);line-height:1.45}
+.defmode{display:flex;gap:6px;margin:8px 0}.defmode button{flex:1;padding:8px}.defmode button.off{background:#EEF2F7;color:var(--navy);font-weight:500}
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.rchip{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;background:#fff;user-select:none}
+.rchip.on{background:#7A1F2B;border-color:#7A1F2B;color:#fff}
+.blk{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:var(--red-bg);margin-top:6px;font-size:13.5px}.blk.n{background:var(--orange-bg)}.blk span{flex:1}.blk button{padding:5px 10px;font-size:12.5px}
+</style></head><body>
+<header>
+  <div><h1>Suricata Attack Panel</h1><p>Every click sends real traffic from the attacker container &middot; alerts come only from Suricata&rsquo;s eve.json</p></div>
+  <div class="row"><span class="pill"><span class="dot" id="live"></span><span id="livetxt">Connecting&hellip;</span></span>
+  <span class="pill">Attacker: <b id="me">&ndash;</b></span><button class="ghost" style="padding:6px 12px" onclick="resetStory()">Reset story</button></div>
+</header>
+<div class="story">
+  <div class="step" id="st-recon"><div class="n">1</div><div><b>Recon</b><span id="sv-recon">scan the target</span></div></div><div class="arrow">&rarr;</div>
+  <div class="step" id="st-breakin"><div class="n">2</div><div><b>Break in</b><span id="sv-breakin">guess the password</span></div></div><div class="arrow">&rarr;</div>
+  <div class="step" id="st-steal"><div class="n">3</div><div><b>Steal</b><span id="sv-steal">copy the database</span></div></div><div class="arrow">&rarr;</div>
+  <div class="step" id="st-disrupt"><div class="n">4</div><div><b>Disrupt</b><span id="sv-disrupt">flood the website</span></div></div>
+</div>
+<div id="blockbar" style="display:none;background:#7A1F2B;color:#fff;padding:14px 28px;font-size:16px;align-items:center;gap:16px;flex-wrap:wrap">
+  <b style="font-size:18px">&#128737; BLOCKED BY THE DEFENDER</b><span id="blocktxt" style="flex:1"></span>
+  <b id="blockleft" style="font-size:18px"></b><button style="background:#fff;color:#7A1F2B" onclick="unblock(me)">Unblock now</button></div>
+<div id="warn" style="display:none;background:#B3261E;color:#fff;padding:12px 28px;font-size:15px;font-weight:600"></div>
+<main>
+<section>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-p="web">Website</button>
+    <button class="tab" data-p="scan">1 &middot; Scan ports</button>
+    <button class="tab" data-p="pkt">1 &middot; Build a packet</button>
+    <button class="tab" data-p="ssh">2&ndash;3 &middot; Break in &amp; steal</button>
+    <button class="tab" data-p="flood">4 &middot; Flood</button>
+    <button class="tab" data-p="scripts">Original scripts</button>
+  </div>
+
+  <div class="pane on" id="p-web"><div class="card">
+    <h3>The target&rsquo;s website</h3>
+    <p class="sub">This is the real website running on the target. Every page you open is one real visit from the attacker. Browse calmly and nothing happens. Open <b>4 pages within 10 seconds</b> (or press Refresh fast) and <b>Rule 5</b> calls it a flood, the same way it wrongly flagged our normal user.</p>
+    <div class="browser"><div class="bbar"><span class="dots"><i></i><i></i><i></i></span>
+      <button class="ghost" onclick="goSite('index.html')">Home</button><button class="ghost" onclick="reloadSite()">&#8635; Refresh</button>
+      <div class="addr" id="addr">http://target/</div></div>
+      <iframe id="site" src="about:blank" title="Target website"></iframe></div>
+  </div></div>
+
+  <div class="pane" id="p-scan"><div class="card">
+    <h3>Scan the target&rsquo;s ports</h3>
+    <p class="sub">A real scanner knocks on each port to find which services are open. <b>Fast</b> knocks on ports 1&ndash;1000 in seconds: <b>Rule 1</b> (20 ports in 10 s) catches it. <b>Slow</b> knocks on one port every 15 s: Rule 1 never fires, but <b>Rule 6</b> (4 unusual ports in 90 s) catches it at the 4th knock.</p>
+    <div class="row"><button onclick="scan('fast')">Fast scan (1&ndash;1000)</button><button class="ghost" onclick="scan('slow')">Slow scan (1&ndash;15, every 15 s)</button><button class="red" onclick="stopAll()">Stop</button>
+      <span class="note" id="scantxt">Not scanning.</span></div>
+    <div class="ports" id="ports"></div>
+    <div class="legend"><span><i style="background:#E6EAF0"></i>not checked yet</span><span><i style="background:#A9B3C1"></i>closed</span><span><i style="background:#7A1F2B"></i>no answer: you were blocked</span><span><i style="background:#1E7B4A"></i>open (a service is listening)</span></div>
+  </div></div>
+
+  <div class="pane" id="p-pkt"><div class="card">
+    <h3>Build your own TCP packet</h3>
+    <p class="sub">Every TCP packet carries flags. Normal connections start with <b>SYN</b> only. Tick flags and send <b>one real packet</b> to the target. Some combinations never happen in normal traffic, so Suricata flags them at once: <b>no flags</b> (Rule 3, NULL) and <b>FIN + PSH + URG</b> (Rule 4, Xmas).</p>
+    <div class="row" style="margin-bottom:6px"><span class="note">Presets:</span><button class="chip" onclick="preset(['SYN'])">Normal start (SYN)</button><button class="chip" onclick="preset([])">NULL (no flags)</button><button class="chip" onclick="preset(['FIN','PSH','URG'])">Xmas (FIN + PSH + URG)</button></div>
+    <div class="tcp" id="flags"></div>
+    <div class="verdict mid" id="verdict"></div>
+    <div class="row" style="margin-top:12px"><span class="note">to port</span><input id="pport" type="number" value="80" min="1" max="65535" style="width:100px"><button onclick="sendPacket()">Send packet</button></div>
+    <pre id="pout" style="height:110px">The packet and the target&rsquo;s reply will appear here.</pre>
+  </div></div>
+
+  <div class="pane" id="p-ssh"><div class="card">
+    <h3>Break in through SSH, then steal the database</h3>
+    <p class="sub">Each password you try is one real SSH login. <b>Rule 2</b> catches <b>5 logins within 10 seconds</b>. Guess the right one and you are inside the target, with a real shell. Then steal the customer database: <b>Rule 7</b> fires once more than 1 MB has left.</p>
+    <div class="term" id="term" onclick="document.getElementById('tin').focus()"></div>
+    <div class="row" style="margin-top:10px"><button class="ghost" onclick="hydra()">Auto-guess with Hydra</button><button class="ghost" onclick="termCmd('exit')">Log out</button><span class="note">Click a password to try it:</span></div>
+    <div class="row" id="pwchips" style="margin-top:8px;gap:6px"></div>
+    <div class="files" id="files">
+      <b>Files on target (/home/labuser)</b>
+      <div class="file" style="margin-top:10px"><div class="ic">SQL</div><div style="flex:1"><b>customers_database.sql</b><div class="note">20 MB &middot; names, emails, orders</div></div><button class="red" id="stealbtn" onclick="steal()">Steal file</button></div>
+      <div class="prog"><i id="sprog"></i><span class="mk" title="1 MB: Rule 7 limit"></span></div>
+      <div class="note" id="stxt" style="margin-top:6px">Red line = 1 MB, where Rule 7 starts to watch.</div>
+    </div>
+  </div></div>
+
+  <div class="pane" id="p-flood"><div class="card">
+    <h3>Flood the website</h3>
+    <p class="sub">Send many website connections at the same moment. A real flood tries to make the site too slow for normal customers. <b>Rule 5</b> fires at <b>4 connections within 10 seconds</b>. Try 2 (nothing), then 8.</p>
+    <div class="row"><span class="note">Connections at once:</span><input type="range" id="fn" min="1" max="20" value="8" oninput="document.getElementById('fnv').textContent=this.value"><b id="fnv">8</b><button class="red" onclick="doFlood()">Flood</button></div>
+    <div class="bars" id="fbars"></div><div class="note" id="ftxt" style="margin-top:8px">Each bar = one connection, height = how long the website took to answer.</div>
+  </div></div>
+
+  <div class="pane" id="p-scripts"><div class="card">
+    <h3>Original test scripts</h3>
+    <p class="sub">The same scripts we used for the measured 5-run tests, unchanged, started with one click.</p>
+    <div class="grid" id="atks"></div>
+    <div class="row" style="margin-top:12px"><button class="red" onclick="stopAll()">Stop</button><span class="note" id="jobtxt">No script running.</span></div>
+    <pre id="log">Script output will appear here.</pre>
+  </div></div>
+</section>
+
+<section>
+  <h2>Suricata is watching</h2>
+  <div class="card">
+    <div class="status">
+      <div class="stat"><div class="n" id="sseen">&ndash;</div><div class="t">packets seen</div></div>
+      <div class="stat" id="sdropbox"><div class="n" id="sdrop">&ndash;</div><div class="t">packets dropped</div></div>
+      <div class="stat"><div class="n" id="scount">0</div><div class="t">alerts on this page</div></div>
+    </div>
+    <div class="meter"><div class="lbl"><span>Rule 1 &middot; your connections, last 10 s</span><b id="m1t">0 / 20</b></div><div class="bar"><i id="m1"></i></div></div>
+    <div class="meter"><div class="lbl"><span>Rule 2 &middot; your SSH logins, last 10 s</span><b id="m2t">0 / 5</b></div><div class="bar"><i id="m2"></i></div></div>
+    <div class="meter"><div class="lbl"><span>Rule 5 &middot; your website visits, last 10 s</span><b id="m5t">0 / 4</b></div><div class="bar"><i id="m5"></i></div></div>
+    <div class="meter"><div class="lbl"><span>Rule 6 &middot; your unusual ports, last 90 s</span><b id="m6t">0 / 4</b></div><div class="bar"><i id="m6"></i></div></div>
+    
+    <p class="note" style="margin:10px 0 0">Bars count this page&rsquo;s own clicks. Only Suricata decides if you are caught.</p>
+  </div>
+  <h2>Defender (automatic response)</h2>
+  <div class="card">
+    <p class="note" id="defstate" style="margin:0">Checking the defender&hellip;</p>
+    <div class="defmode"><button id="dm-off" onclick="setDef({enabled:false})">Detect only (IDS)</button><button id="dm-on" onclick="setDef({enabled:true})">Detect + block</button></div>
+    <div class="note">Block when Suricata raises:</div>
+    <div class="rchips" id="rchips"></div>
+    <div class="row"><span class="note">Unblock automatically after</span><select id="ddur" onchange="setDef({duration:parseInt(this.value,10)})" style="font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:8px">
+      <option value="15">15 s</option><option value="20">20 s</option><option value="30">30 s</option><option value="60">60 s</option><option value="0">never (manual)</option></select></div>
+    <div id="blist"></div>
+  </div>
+  <h2>Live alerts</h2>
+  <div class="row" style="margin:-2px 0 10px"><button class="ghost" style="padding:6px 12px" onclick="clearFeed()">Clear</button>
+    <span class="note"><span class="badge">YOU</span> attacker &nbsp; <span class="badge n">NORMAL USER</span> false alarm</span></div>
+  <div class="feed" id="feed"><div class="empty" id="empty">No alerts yet. Start with the Website or Scan tab.</div></div>
+</section>
+</main>
+<div id="caught" onclick="this.classList.remove('show')"><div class="box">
+  <div class="big" id="cbig">CAUGHT BY SURICATA</div><div class="r" id="cr"></div><div class="w" id="cw"></div><div class="note" style="margin-top:14px">click anywhere to close</div></div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function api(path,body){const r=await fetch(path,body===undefined?{}:{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});return r.json();}
+let since=0,shown=0,hideT=null,loggedIn=false,jobSeen=0,jobKind=null,curPage="index.html",scanMode=null;
+const story={recon:null,breakin:null,steal:null,disrupt:null};
+
+/* tabs */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+ document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+t.dataset.p));
+ if(t.dataset.p==="web"&&$("site").src==="about:blank")goSite("index.html");if(t.dataset.p==="ssh")$("tin")&&$("tin").focus();});
+
+/* website */
+function goSite(p){curPage=p;$("site").src="/site/"+p+"?t="+Date.now();}
+function reloadSite(){goSite(curPage);}
+$("site").addEventListener("load",()=>{try{const u=$("site").contentWindow.location.pathname;if(u.startsWith("/site/")){curPage=u.slice(6)||"index.html";$("addr").textContent="http://target/"+(curPage==="index.html"?"":curPage);}}catch(e){}});
+
+/* scanner */
+function buildPorts(mode){const g=$("ports");g.className="ports"+(mode==="slow"?" slow":"");g.innerHTML="";const n=mode==="slow"?15:1000;
+ for(let i=1;i<=n;i++){const c=document.createElement("i");c.title="port "+i;if(mode==="slow")c.textContent=i;g.appendChild(c);}scanMode=mode;}
+async function scan(m){buildPorts(m);const r=await api("/api/scan",{mode:m});$("scantxt").textContent=r.result;}
+function drawScan(s){if(!s.mode)return;if(scanMode!==s.mode)buildPorts(s.mode);const cells=$("ports").children;
+ for(let i=0;i<cells.length;i++){const ch=s.map[i];cells[i].className=ch==="o"?"o":(ch==="c"?"c":(ch==="x"?"x":""));}
+ const open=s.open.length?" Open: "+s.open.join(", ")+".":"";
+ const nx=(s.map.match(/x/g)||[]).length;$("scantxt").textContent=(s.running?"Scanning… ":"Done. ")+s.done+" / "+s.total+" ports checked."+open+(nx?" "+nx+" got no answer: you were blocked.":"")+(s.next_in?" Next knock in "+s.next_in+" s.":"");}
+
+/* packets */
+const FL=[["SYN","start"],["ACK","acknowledge"],["FIN","finish"],["RST","reset"],["PSH","push"],["URG","urgent"]];let flags=new Set(["SYN"]);
+function drawFlags(){$("flags").innerHTML=FL.map(([f,d])=>'<div class="flag'+(flags.has(f)?" on":"")+'" onclick="tog(\''+f+'\')"><b>'+f+'</b><span>'+d+'</span></div>').join("");
+ const k=[...flags].sort().join("+");let v,c;
+ if(flags.size===0){v="No flags at all: a NULL packet. Normal traffic never sends this. Expect Rule 3.";c="bad";}
+ else if(k==="FIN+PSH+URG"){v="FIN + PSH + URG: an Xmas packet, “lit up like a Christmas tree”. Expect Rule 4.";c="bad";}
+ else if(k==="SYN"){v="SYN only: the normal first packet of every connection. Nothing to see here.";c="ok";}
+ else{v="Unusual mix ("+k+"). Our seven rules don’t look for this exact one, so Suricata may stay quiet: a rule only sees what it was written for.";c="mid";}
+ $("verdict").className="verdict "+c;$("verdict").textContent=v;}
+function tog(f){flags.has(f)?flags.delete(f):flags.add(f);drawFlags();}
+function preset(a){flags=new Set(a);drawFlags();}
+async function sendPacket(){$("pout").textContent="Sending…";const r=await api("/api/packet",{flags:[...flags],port:parseInt($("pport").value,10)});$("pout").textContent="$ "+(r.cmd||"")+"\n"+(r.output||"");}
+
+/* terminal */
+function tline(t,c){const d=document.createElement("div");d.className="l "+(c||"");d.textContent=t;$("term").insertBefore(d,$("tinrow"));$("term").scrollTop=1e9;}
+function tprompt(){const old=$("tinrow");if(old)old.remove();const r=document.createElement("div");r.className="in";r.id="tinrow";
+ r.innerHTML=loggedIn?'<span class="prompt">labuser@target:~$</span><input id="tin" autocomplete="off" spellcheck="false">':'<span>labuser@target\'s password:</span><input id="tin" type="password" autocomplete="off">';
+ $("term").appendChild(r);$("tin").addEventListener("keydown",e=>{if(e.key==="Enter"){const v=$("tin").value;$("tin").value="";loggedIn?termCmd(v):login(v);}});$("tin").focus();
+ $("files").style.display=loggedIn?"block":"none";}
+async function login(pw){if(!pw)return;tline("labuser@target's password: "+"•".repeat(pw.length)+"   (tried: "+pw+")","dim");
+ const r=await api("/api/ssh/login",{password:pw});for(const l of r.lines)tline(l,r.ok?"ok":"err");
+ if(r.ok){loggedIn=true;tline("");}else tline("$ ssh labuser@target","dim");tprompt();}
+async function termCmd(c){if(!loggedIn&&c!=="exit")return;tline("labuser@target:~$ "+c);const r=await api("/api/ssh/cmd",{cmd:c});for(const l of r.lines)tline(l);
+ if(r.logged_out){loggedIn=false;tline("$ ssh labuser@target","dim");}tprompt();}
+async function hydra(){jobSeen=0;jobKind="hydra";tline("$ hydra -l labuser -P wordlist.txt -t 4 -f -V ssh://target","dim");const r=await api("/api/ssh/hydra",{});if(r.result&&!r.result.endsWith("started."))tline(r.result,"err");}
+async function steal(){$("stxt").style.color="";$("stxt").textContent="Starting…";const r=await api("/api/steal",{});$("stxt").textContent=r.result;if(!/started/.test(r.result))$("stxt").style.color="var(--red)";}
+function drawSteal(s){$("sprog").style.background=s.blocked?"var(--red)":"";if(!s.running&&!s.done&&!s.error)return;const p=Math.min(100,s.bytes/s.total*100);$("sprog").style.width=p+"%";
+ const mb=(s.bytes/1048576).toFixed(1);$("stealbtn").disabled=s.running;
+ $("stxt").style.color=s.error?"var(--red)":"";$("stxt").textContent=s.error?s.error:(s.running&&s.phase&&s.phase!=="Downloading"?s.phase:s.running?"Downloading… "+mb+" MB of 20 MB"+(s.bytes>1e6?"  — past 1 MB: Rule 7 should fire":""):(s.done?"Stolen: "+mb+" MB copied to the attacker.":""));}
+
+/* flood */
+async function doFlood(){const n=parseInt($("fn").value,10);$("ftxt").textContent="Sending "+n+" connections at once…";const r=await api("/api/flood",{n});
+ const max=Math.max(...r.results.map(x=>x.ms),50);$("fbars").innerHTML=r.results.map(x=>'<div style="height:'+Math.max(3,x.ms/max*130)+'px;background:'+(x.ok?'var(--navy)':'var(--red)')+'"><span>'+x.ms+'</span></div>').join("");
+ $("ftxt").textContent=n+" connections sent. Bars show answer time in ms."+(n>=4?" That is "+n+" in under 10 s: Rule 5 should fire.":" Below Rule 5's limit of 4: no alert expected.");}
+
+/* scripts */
+const ATTACKS=[["portscan","Port scan","nmap -sS ports 1–1000","Rule 1"],["brute","Password list attack","Hydra, 20 passwords on SSH","Rule 2"],
+["malformed","Strange packets","nmap NULL + Xmas scans","Rules 3 + 4"],["exfil","Upload a 20 MB file","scp, one connection","Rule 7"],
+["flood","Website flood","6 netcat connections at once","Rule 5"],["slow","Slow scan","nmap -T1 -f, about 4 min","Rule 6"]];
+async function run(k){jobSeen=0;jobKind="script";const r=await api("/api/run",{scenario:k});$("jobtxt").textContent=r.result;}
+async function stopAll(){await api("/api/stop",{});$("jobtxt").textContent="Stopped.";}
+
+/* alerts, story, meters */
+function setM(id,n,max){const el=$(id);el.style.width=Math.min(100,n/max*100)+"%";el.className=n>=max?"full":(n>=max-1?"hot":"");$(id+"t").textContent=(n>max?max+"+":n)+" / "+max;}
+function tm(ts){try{return new Date(ts).toLocaleTimeString()}catch(e){return ts}}
+function addAlert(a){const e=$("empty");if(e)e.remove();shown++;$("scount").textContent=shown;
+ const cls=a.who==="you"?"you":(a.who==="normal user"?"normal":"");
+ const badge=a.who==="you"?'<span class="badge">YOU</span>':(a.who==="normal user"?'<span class="badge n">NORMAL USER &middot; FALSE ALARM</span>':'<span class="badge o">OTHER</span>');
+ const d=document.createElement("div");d.className="al "+cls;
+ d.innerHTML='<div class="top"><span>'+tm(a.ts)+' &middot; '+esc(a.rule)+' (sid '+a.sid+')</span>'+badge+'</div><div class="name">'+esc(a.name)+'</div><div class="why">'+esc(a.why)+'</div><div class="note">'+esc(a.src)+' &rarr; '+esc(a.dst)+(a.dport?':'+a.dport:'')+'</div>';
+ const f=$("feed");f.insertBefore(d,f.firstChild);while(f.children.length>120)f.removeChild(f.lastChild);
+ if(a.who==="you"&&a.stage&&!story[a.stage]){story[a.stage]=a;$("st-"+a.stage).classList.add("hit");$("sv-"+a.stage).textContent="caught by "+a.rule+" at "+tm(a.ts);}}
+function resetStory(){for(const k in story){story[k]=null;$("st-"+k).classList.remove("hit");}
+ $("sv-recon").textContent="scan the target";$("sv-breakin").textContent="guess the password";$("sv-steal").textContent="copy the database";$("sv-disrupt").textContent="flood the website";}
+function clearFeed(){$("feed").innerHTML='<div class="empty" id="empty">Cleared. New alerts will appear here.</div>';shown=0;$("scount").textContent=0;}
+function caught(a){$("cbig").textContent="CAUGHT BY SURICATA";$("cr").textContent=a.rule+" · "+a.name;$("cw").textContent=a.why;$("caught").classList.add("show");clearTimeout(hideT);hideT=setTimeout(()=>$("caught").classList.remove("show"),3500);}
+let lastSeen=null,lastChange=Date.now();
+function health(s){const w=$("warn");let msg="";
+ if(s.stats.seen!=null&&s.stats.seen!==lastSeen){lastSeen=s.stats.seen;lastChange=Date.now();}
+ const age=s.stats.ts?(Date.now()-new Date(s.stats.ts).getTime())/1000:null;
+ if(!s.eve_found)msg="Suricata\u2019s log file was not found. Is the suricata container running?";
+ else if(age!==null&&age>40)msg="Suricata has not written to its log for "+Math.round(age)+" s. Restart the lab: docker compose down, then docker compose up -d";
+ else if(lastSeen!==null&&Date.now()-lastChange>40000)msg="Suricata is not seeing any packets, so it cannot catch you. Restart the lab: docker compose down, then docker compose up -d";
+ w.style.display=msg?"block":"none";w.textContent=msg?"\u26A0 "+msg:"";}
+let lastBlockSince=0,defCfg=null,me=null;
+const RN={1000001:"1 Scan",1000002:"2 Password",1000003:"3 NULL",1000004:"4 Xmas",1000005:"5 Flood",1000006:"6 Slow scan",1000007:"7 Data theft"};
+async function unblock(ip){const r=await api("/api/unblock",{ip:ip||"all"});$("blocktxt").textContent=r.result;}
+async function setDef(ch){if(!defCfg)return;const c=Object.assign({},defCfg,ch);const r=await api("/api/defense",c);if(r.config){defCfg=r.config;drawCfg();}}
+function togRule(sid){if(!defCfg)return;const s=new Set(defCfg.sids);s.has(sid)?s.delete(sid):s.add(sid);setDef({sids:[...s]});}
+function drawCfg(){const c=defCfg;$("dm-off").className=c.enabled?"off":"";$("dm-on").className=c.enabled?"red":"off";
+ $("rchips").innerHTML=Object.keys(RN).map(k=>'<span class="rchip'+(c.sids.includes(+k)?" on":"")+'" onclick="togRule('+k+')">Rule '+RN[k]+'</span>').join("");
+ $("rchips").style.opacity=c.enabled?1:.45;$("ddur").value=String(c.duration);}
+function drawDefense(d){const b=$("blockbar");
+ if(!d||!d.running){$("defstate").innerHTML="<b>Defender is not running.</b> Suricata only detects; nothing is blocked. Start it with: docker compose up -d --build";b.style.display="none";return;}
+ if(!defCfg||JSON.stringify(defCfg)!==JSON.stringify(d.config)){defCfg=d.config;drawCfg();}
+ $("defstate").innerHTML=d.config.enabled?"<b>On.</b> When Suricata raises a selected rule, the target&rsquo;s firewall drops all traffic from that machine.":"<b>Off.</b> Suricata only detects (IDS). Nothing is blocked.";
+ const bl=d.blocks||{};$("blist").innerHTML=Object.entries(bl).map(([ip,x])=>'<div class="blk'+(x.who==="normal user"?" n":"")+'"><span><b>'+(x.who==="you"?"You":x.who==="normal user"?"NORMAL USER (false alarm!)":esc(ip))+'</b> blocked after '+esc(x.rule)+' &middot; '+esc(x.name)+(x.left!=null?' &middot; '+x.left+' s left':'')+'</span><button class="ghost" onclick="unblock(\''+ip+'\')">Unblock</button></div>').join("");
+ const mine=bl[me];
+ if(mine){b.style.display="flex";$("blockleft").textContent=mine.left!=null?"unblocks in "+mine.left+" s":"";
+  $("blocktxt").textContent="After Suricata raised "+mine.rule+" ("+mine.name+"), the target\u2019s firewall drops all your traffic. Your attacks will fail until the block ends."+(mine.ok===false?" (firewall error: "+mine.error+")":"");
+  if(mine.since!==lastBlockSince){lastBlockSince=mine.since;$("cbig").textContent="CAUGHT AND BLOCKED";$("cr").textContent=mine.rule+" \u00b7 "+mine.name;
+   $("cw").textContent="Suricata detected it, and the defender cut you off"+(mine.left!=null?" for "+(mine.left+1)+" seconds":"")+". The target now ignores all your traffic.";
+   $("caught").classList.add("show");clearTimeout(hideT);hideT=setTimeout(()=>$("caught").classList.remove("show"),4500);
+   const st=Object.keys(story).find(k=>story[k]&&story[k].sid===mine.sid);if(st)$("sv-"+st).textContent="caught by "+mine.rule+" \u00b7 blocked";}}
+ else b.style.display="none";}
+const fmt=n=>n==null?"–":Number(n).toLocaleString();
+async function poll(){try{const s=await api("/api/state?since="+since);
+ $("live").className="dot on";$("livetxt").textContent=s.eve_found?"Suricata log connected":"Waiting for eve.json";me=s.me;$("me").textContent=s.me||"unknown";
+ let lastYou=null;for(const a of s.alerts){addAlert(a);if(a.who==="you")lastYou=a;}if(lastYou)caught(lastYou);since=Math.max(since,s.last_id);
+ $("sseen").textContent=fmt(s.stats.seen);health(s);$("sdrop").textContent=fmt(s.stats.dropped);$("sdropbox").className="stat"+((s.stats.dropped||0)>0?" bad":"");
+ const c=s.counters;setM("m1",c.r1,20);setM("m2",c.r2,5);setM("m5",c.r5,4);setM("m6",c.r6,4);
+ drawScan(s.scan);drawSteal(s.steal);drawDefense(s.defense);
+ const j=s.job;if(j.kind==="hydra"&&jobKind==="hydra"){for(const l of j.log.slice(1).slice(jobSeen))tline(l,/host:|password:/.test(l)?"ok":"dim");jobSeen=Math.max(0,j.log.length-1);if(!j.running)jobKind=null;}
+ if(j.kind==="script"){$("log").textContent=j.log.join("\n");$("log").scrollTop=1e9;if(j.running)$("jobtxt").textContent=j.name+" is running…";}
+ document.querySelectorAll(".atk button").forEach(b=>b.disabled=j.running);
+}catch(e){$("live").className="dot";$("livetxt").textContent="Panel offline";}setTimeout(poll,1000);}
+
+(async()=>{
+ $("atks").innerHTML=ATTACKS.map(([k,t,d,r])=>'<div class="atk"><span class="tag">'+r+'</span><b>'+t+'</b><span>'+d+'</span><button onclick="run(\''+k+'\')">Launch</button></div>').join("");
+ drawFlags();buildPorts("fast");
+ tline("$ ssh labuser@target","dim");
+ try{const st=await api("/api/session");loggedIn=st.logged_in;}catch(e){}tprompt();
+ try{const w=await api("/api/passwords");$("pwchips").innerHTML=w.words.map(p=>'<button class="chip" data-p="'+esc(p)+'">'+esc(p)+'</button>').join("");
+   $("pwchips").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(!loggedIn)login(b.dataset.p);});}catch(e){}
+ goSite("index.html");
+ const first=await api("/api/state?since=0");since=first.last_id;poll();
+})();
+</script><style>
+.ex{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.ex h3{margin:0 0 10px;font-size:18px;display:flex;align-items:center;gap:8px}.ex h3 .q{background:#E8EEF6;color:var(--navy);border-radius:999px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.simple{font-size:15.5px;line-height:1.6;margin:0 0 14px}
+.flow{display:flex;align-items:stretch;gap:0;margin:6px 0 14px;overflow-x:auto;padding-bottom:4px}
+.fs{flex:1;min-width:120px;border:2px solid var(--line);border-radius:10px;padding:10px 10px;background:#FAFBFC;transition:all .3s;position:relative}
+.fs .no{width:22px;height:22px;border-radius:50%;background:#E3E8EF;color:var(--muted);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.fs b{display:block;font-size:13.5px;line-height:1.3}.fs .d{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35;min-height:16px}.fs .t{font-size:11px;color:var(--muted);margin-top:3px}
+.fs.done{border-color:var(--navy);background:#EEF3FA}.fs.done .no{background:var(--navy);color:#fff}
+.fs.alert{border-color:var(--red);background:var(--red-bg)}.fs.alert .no{background:var(--red);color:#fff}.fs.alert b{color:var(--red)}
+.fs.safe{border-color:var(--green);background:var(--green-bg)}.fs.safe .no{background:var(--green);color:#fff}.fs.safe b{color:var(--green)}
+.farrow{align-self:center;color:#9AA5B4;padding:0 4px;font-size:18px}
+.rulebox{height:auto;background:#0E1420;color:#D7E0EC;border-radius:10px;padding:10px 12px;font-family:Consolas,Menlo,monospace;font-size:12.5px;white-space:pre-wrap;margin:0}
+.plain{font-size:14px;margin:6px 0 14px;color:var(--ink)}.plain b{color:var(--navy)}
+.say{background:#FFF8E6;border:1px solid #F1D9A0;border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.5}.say b{color:#8A5A00}
+.exhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 6px}.exhead span{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.exhead button{padding:4px 10px;font-size:12.5px}
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.big3>div{background:#F4F6F9;border-radius:10px;padding:14px}.big3 b{display:block;font-size:15px;margin-bottom:4px}.big3 span{font-size:13.5px;color:var(--muted);line-height:1.45}
+@media(max-width:800px){.big3{grid-template-columns:1fr}}
+table.t{width:100%;border-collapse:collapse;font-size:14px}table.t th{background:var(--navy);color:#fff;text-align:left;padding:8px 10px;font-weight:600}table.t td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.t tr.miss td{background:var(--red-bg)}
+.kpi{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}.kpi div{flex:1;min-width:150px;background:#F4F6F9;border-radius:10px;padding:12px 14px}.kpi .n{font-size:26px;font-weight:800;color:var(--navy)}.kpi .n.r{color:var(--red)}.kpi .l{font-size:12.5px;color:var(--muted)}
+.find{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.find>div{border-radius:10px;padding:14px;border:1px solid var(--line)}
+.find .g{background:var(--green-bg);border-color:#BFE3CC}.find .r{background:var(--red-bg);border-color:#F0B8B3}.find .o{background:var(--orange-bg);border-color:#F3CFA8}.find .k{background:#EEF1F5}
+.find b{display:block;font-size:15px;margin-bottom:5px}.find span{font-size:13.5px;line-height:1.5}
+@media(max-width:800px){.find{grid-template-columns:1fr}}
+</style>
+<script>
+(function(){
+const EX={
+ web:{steps:["You open a page","Suricata counts your visits","Rule 5: flood alert","Defender blocks you"],
+  simple:"The website lives on the target, behind <b>door 80</b>. Every page you open is one visit. A normal customer opens a page every few seconds. Opening <b>4 pages within 10 seconds</b> looks like a flood, so Suricata raises <b>Rule 5</b>.",
+  rule:'alert tcp any any -> $TARGET 80 (msg:"LOCAL Possible HTTP flood"; flags:S;\n  threshold:type both, track by_src, count 4, seconds 10; sid:1000005;)',
+  plain:"<b>In plain words:</b> count new connections to door 80 from the same machine. 4 within 10 seconds = alert.",
+  say:"Calm browsing is normal. Very fast visits look like a flood, even from an innocent person. That is exactly how our normal user got <b>4 false alarms</b>: Suricata sees behavior, not intent."},
+ scan:{steps:["Scanner knocks on doors","Suricata counts the knocks","Alert: Rule 1 or Rule 6","Defender blocks you"],
+  simple:"A computer has numbered <b>doors called ports</b>. Behind an open door there is a program (door 80 = website, door 22 = login). The attacker knocks on every door to find the open ones: those are the ways in. A normal visitor uses one door. <b>Nobody normal knocks on 20 doors in 10 seconds.</b>",
+  rule:'Rule 1: flags:S; threshold: count 20, seconds 10        (fast scan)\nRule 6: ports not 80/22; threshold: count 4, seconds 90  (slow scan)',
+  plain:"<b>In plain words:</b> Rule 1 remembers 10 seconds, Rule 6 remembers 90 seconds. A slow scan stays under Rule 1, but Rule 6 still catches it.",
+  say:"Scanning is step 1 of an attack: the map. Fast is caught by Rule 1. Slow hides from Rule 1 but Rule 6 catches it. An even slower attacker would escape: <b>patience beats any counter</b>."},
+ pkt:{steps:["You choose the flags","One packet is sent","Suricata reads the flags","Alert or nothing","Defender blocks you"],
+  simple:"Every packet carries small <b>flags</b> that say what it is for, like stickers on an envelope. A normal conversation starts with <b>SYN</b> (“hello”). Some combinations never happen in normal traffic: <b>no flags at all</b> (NULL) or <b>FIN + PSH + URG</b> (Xmas). Attackers send them to learn about the target quietly.",
+  rule:'Rule 3: flags:0;    (no flags at all)  → NULL scan\nRule 4: flags:FPU;  (FIN + PSH + URG)  → Xmas scan',
+  plain:"<b>In plain words:</b> no counting needed. One strange packet is enough for an alert.",
+  say:"Rules 3 and 4 fire on <b>every</b> strange packet. One NULL + Xmas run produced about <b>204 alerts</b>, which is why we counted runs, not alerts."},
+ ssh:{steps:["You try a password","Suricata counts the tries","Rule 2: password guessing","Defender blocks you","Right password: inside"],
+  simple:"<b>Door 22</b> is the staff entrance (SSH). It asks for a password. Each guess is one new connection. An employee logs in once; a thief tries many passwords fast. Suricata <b>cannot read the password</b> (it is encrypted), but it can <b>count the tries</b>.",
+  rule:'alert tcp any any -> $TARGET 22 (msg:"LOCAL SSH brute force attempt"; flags:S;\n  threshold:type both, track by_src, count 5, seconds 10; sid:1000002;)',
+  plain:"<b>In plain words:</b> 5 new connections to door 22 within 10 seconds = alert.",
+  say:"Suricata never sees the password, only the number of tries. A thief guessing slowly, one password every few seconds, would not be caught by this rule."},
+ steal:{title:"Stealing the file",steps:["Download starts","Passes 1 MB","Rule 7: data theft","Defender blocks you","Download stopped"],
+  simple:"Once inside, the thief copies a <b>20 MB customer database</b>. The copy is encrypted, so Suricata cannot read it, but it <b>measures how much data moves</b> in one connection. More than <b>1 MB</b> in one go is unusual here.",
+  rule:'alert tcp any any <> $TARGET any (msg:"LOCAL Possible bulk data transfer";\n  flow:established; stream_size:either,>,1000000; sid:1000007;)',
+  plain:"<b>In plain words:</b> any single connection carrying more than 1 MB = alert.",
+  say:"Our biggest lesson: at first Suricata <b>missed this completely</b> because it was dropping packets (the silent failure). After we fixed the capture buffer, it caught 5/5. And even with blocking, a few MB leave before the block, because reacting takes about a second."},
+ flood:{steps:["Many connections at once","Suricata counts them","Rule 5: flood alert","Defender blocks you"],
+  simple:"A flood sends many connections <b>at the same moment</b> to make the website too busy for real customers (denial of service). Suricata counts new connections to <b>door 80</b>.",
+  rule:'alert tcp any any -> $TARGET 80 (flags:S; threshold: count 4, seconds 10; sid:1000005;)',
+  plain:"<b>In plain words:</b> 4 new website connections within 10 seconds = alert.",
+  say:"2 connections: no alert. 8 connections: alert. The same rule wrongly flagged our normal user <b>4 times in 1,368 visits (0.3%)</b>: a tiny rate, but on a big website that is thousands of false alarms a day."}
+};
+const st={};
+function fmtT(){return new Date().toLocaleTimeString();}
+function exCard(key,host,title){const e=EX[key];const d=document.createElement("div");d.className="ex";
+ d.innerHTML='<h3><span class="q">?</span>'+(title||"How it works")+'</h3><p class="simple">'+e.simple+'</p>'+
+ '<div class="exhead"><span>Live: what is happening now</span><button class="ghost" onclick="exReset(\''+key+'\')">Reset</button></div>'+
+ '<div class="flow" id="flow-'+key+'">'+e.steps.map((s,i)=>(i?'<div class="farrow">&rarr;</div>':'')+'<div class="fs" id="fs-'+key+'-'+i+'"><div class="no">'+(i+1)+'</div><b>'+s+'</b><div class="d"></div><div class="t"></div></div>').join("")+'</div>'+
+ '<div class="exhead"><span>The rule we wrote</span></div><pre class="rulebox">'+e.rule.replace(/</g,"&lt;")+'</pre><p class="plain">'+e.plain+'</p>'+
+ '<div class="say"><b>Say this:</b> '+e.say+'</div>';
+ host.appendChild(d);}
+window.exTrack=function(key,i,detail,state){const el=document.getElementById("fs-"+key+"-"+i);if(!el)return;
+ el.className="fs "+(state||"done");if(detail!==undefined)el.querySelector(".d").innerHTML=detail;el.querySelector(".t").textContent=fmtT();};
+window.exDetail=function(key,i,detail){const el=document.getElementById("fs-"+key+"-"+i);if(el)el.querySelector(".d").innerHTML=detail;};
+window.exReset=function(key){(EX[key].steps).forEach((_,i)=>{const el=document.getElementById("fs-"+key+"-"+i);if(el){el.className="fs";el.querySelector(".d").textContent="";el.querySelector(".t").textContent="";}});st[key]={};};
+
+/* ---------- build: explainer cards under each tab ---------- */
+exCard("web",$("p-web"));exCard("scan",$("p-scan"));exCard("pkt",$("p-pkt"));
+exCard("ssh",$("p-ssh"),"How it works: breaking in");exCard("steal",$("p-ssh"),"How it works: stealing the file");exCard("flood",$("p-flood"));
+
+/* ---------- new tabs: Start here + Our results ---------- */
+const tabs=$("tabs");
+const bStart=document.createElement("button");bStart.className="tab";bStart.dataset.p="start";bStart.innerHTML="Start here";tabs.insertBefore(bStart,tabs.firstChild);
+const bRes=document.createElement("button");bRes.className="tab";bRes.dataset.p="results";bRes.innerHTML="Our results";tabs.insertBefore(bRes,tabs.querySelector('[data-p=scripts]'));
+const sec=$("p-web").parentNode;
+const pStart=document.createElement("div");pStart.className="pane";pStart.id="p-start";
+pStart.innerHTML=`
+<div class="ex"><h3>Our lab in one picture</h3>
+<p class="simple">Five Docker containers on one laptop. The attack network is <b>closed</b>: no traffic can leave it (our trust boundary). The attacker and a normal user both talk to the target. Suricata sits <b>inside the target's network</b> and sees every packet, like a guard inside the building.</p>
+<svg viewBox="0 0 900 400" width="100%" role="img" aria-label="Lab diagram: attacker and normal user send traffic to the target; Suricata watches the target's network and writes alerts to eve.json; the responder blocks attackers on the target's firewall; this page and EveBox show the alerts.">
+<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#5F6B7A"/></marker><marker id="ahr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#B3261E"/></marker><marker id="ahb" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#1F3A5F"/></marker></defs>
+<rect x="10" y="30" width="620" height="360" rx="14" fill="#F5F7FB" stroke="#9AA5B4" stroke-dasharray="7 6" stroke-width="2"/>
+<text x="26" y="56" font-size="13" font-weight="700" fill="#5F6B7A">CLOSED LAB NETWORK · NO INTERNET · TRUST BOUNDARY</text>
+<rect x="34" y="80" width="200" height="80" rx="10" fill="#FDECEA" stroke="#B3261E" stroke-width="2"/><text x="134" y="113" text-anchor="middle" font-size="17" font-weight="700" fill="#1D2433">Attacker (Kali)</text><text x="134" y="136" text-anchor="middle" font-size="13" fill="#5F6B7A">nmap, Hydra, hping3</text>
+<rect x="34" y="270" width="200" height="80" rx="10" fill="#fff" stroke="#9AA5B4" stroke-width="2"/><text x="134" y="303" text-anchor="middle" font-size="17" font-weight="700" fill="#1D2433">Normal user</text><text x="134" y="326" text-anchor="middle" font-size="13" fill="#5F6B7A">visits every 3–10 s</text>
+<rect x="360" y="80" width="240" height="290" rx="12" fill="#fff" stroke="#1D2433" stroke-width="2"/>
+<text x="480" y="108" text-anchor="middle" font-size="17" font-weight="700" fill="#1D2433">Target</text><text x="480" y="130" text-anchor="middle" font-size="13" fill="#5F6B7A">website (door 80) · SSH (door 22)</text>
+<rect x="380" y="150" width="200" height="88" rx="10" fill="#1F3A5F"/><text x="480" y="184" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">Suricata 7.0.17</text><text x="480" y="206" text-anchor="middle" font-size="12.5" fill="#C9D4E3">sees every packet</text><text x="480" y="225" text-anchor="middle" font-size="12.5" fill="#C9D4E3">checks our 7 rules</text>
+<rect x="380" y="262" width="200" height="88" rx="10" fill="#7A1F2B"/><text x="480" y="296" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">Responder</text><text x="480" y="318" text-anchor="middle" font-size="12.5" fill="#F3D6DA">firewall: blocks the</text><text x="480" y="336" text-anchor="middle" font-size="12.5" fill="#F3D6DA">attacker for 20 s</text>
+<rect x="680" y="150" width="205" height="100" rx="10" fill="#fff" stroke="#1F3A5F" stroke-width="2"/><text x="782" y="185" text-anchor="middle" font-size="16" font-weight="700" fill="#1D2433">This page + EveBox</text><text x="782" y="208" text-anchor="middle" font-size="12.5" fill="#5F6B7A">show the alerts</text><text x="782" y="227" text-anchor="middle" font-size="12.5" fill="#5F6B7A">and the blocks</text>
+<line x1="234" y1="120" x2="354" y2="120" stroke="#B3261E" stroke-width="3" marker-end="url(#ahr)"/><text x="244" y="110" font-size="12.5" font-weight="700" fill="#B3261E">attacks</text>
+<path d="M234 310 H300 V150 H354" fill="none" stroke="#9AA5B4" stroke-width="3" marker-end="url(#ah)"/><text x="240" y="330" font-size="12.5" fill="#5F6B7A">normal visits</text>
+<line x1="580" y1="194" x2="674" y2="194" stroke="#1F3A5F" stroke-width="3" marker-end="url(#ahb)"/><text x="590" y="184" font-size="12.5" font-weight="700" fill="#1F3A5F">eve.json</text>
+<line x1="480" y1="240" x2="480" y2="258" stroke="#1F3A5F" stroke-width="3" marker-end="url(#ahb)"/><text x="490" y="254" font-size="11.5" fill="#1F3A5F">alert</text>
+</svg></div>
+
+<div class="ex"><h3>What happens to every packet</h3>
+<div class="flow">
+<div class="fs done"><div class="no">1</div><b>A packet arrives</b><div class="d">from the attacker or the normal user</div></div><div class="farrow">&rarr;</div>
+<div class="fs done"><div class="no">2</div><b>Suricata copies it</b><div class="d">it watches; it does not stop traffic</div></div><div class="farrow">&rarr;</div>
+<div class="fs done"><div class="no">3</div><b>Checks our 7 rules</b><div class="d">flags, door number, counts, size</div></div><div class="farrow">&rarr;</div>
+<div class="fs alert"><div class="no">4</div><b>Match = alert</b><div class="d">written to eve.json, shown here</div></div><div class="farrow">&rarr;</div>
+<div class="fs alert"><div class="no">5</div><b>Responder blocks</b><div class="d">firewall drops the attacker for 20 s</div></div>
+</div>
+<p class="simple" style="margin:0">Suricata is an <b>IDS</b>: it detects. The <b>responder</b> adds the action, like real tools such as fail2ban: detect, then block for a short time, then unblock.</p></div>
+
+<div class="ex"><h3>Our 7 rules: things a normal user never does</h3>
+<table class="t"><tr><th>Rule</th><th>Catches</th><th>In simple words</th><th>Limit</th></tr>
+<tr><td>1</td><td>Fast port scan</td><td>knocking on many doors</td><td>20 in 10 s</td></tr>
+<tr><td>2</td><td>Password guessing</td><td>many logins on door 22</td><td>5 in 10 s</td></tr>
+<tr><td>3</td><td>NULL scan</td><td>an envelope with no stickers (flags)</td><td>every packet</td></tr>
+<tr><td>4</td><td>Xmas scan</td><td>FIN + PSH + URG at once</td><td>every packet</td></tr>
+<tr><td>5</td><td>Website flood</td><td>many visits at once on door 80</td><td>4 in 10 s</td></tr>
+<tr><td>6</td><td>Slow scan</td><td>knocking slowly on unusual doors</td><td>4 in 90 s</td></tr>
+<tr><td>7</td><td>Data theft</td><td>one connection carrying a lot of data</td><td>&gt; 1 MB</td></tr></table></div>
+
+<div class="ex"><h3>Three tools, three jobs</h3>
+<div class="big3"><div><b>Firewall</b><span>Decides which doors are open, using a list written in advance. Does not judge behavior.</span></div>
+<div><b>IDS (Suricata)</b><span>Watches what people do through the open doors and raises alerts. Does not block.</span></div>
+<div><b>IDS + responder (ours)</b><span>Suricata detects, then the firewall blocks that attacker for 20 s. Like fail2ban.</span></div></div></div>
+
+<div class="ex"><h3>How to follow this page</h3>
+<p class="simple" style="margin:0">Go through the tabs in order. Each one is a real attack: <b>1 Scan</b> → <b>1 Packet</b> → <b>2–3 Break in &amp; steal</b> → <b>4 Flood</b>. Under every tab, the <b>How it works</b> card explains it simply and lights up live. The story bar at the top turns red as Suricata catches each step.</p></div>`;
+sec.insertBefore(pStart,$("p-web"));
+const pRes=document.createElement("div");pRes.className="pane";pRes.id="p-results";
+pRes.innerHTML=`
+<div class="ex"><h3>What we measured (5 runs per attack, script-based tests)</h3>
+<table class="t"><tr><th>Attack</th><th>Rule</th><th>Runs</th><th>Caught</th><th>Missed</th></tr>
+<tr><td>Port scan (nmap)</td><td>1</td><td>5</td><td>5</td><td>0</td></tr>
+<tr><td>Password guessing (Hydra)</td><td>2</td><td>5</td><td>5</td><td>0</td></tr>
+<tr><td>NULL + Xmas packets</td><td>3, 4</td><td>5</td><td>5</td><td>0</td></tr>
+<tr><td>Data theft, 20 MB (scp)</td><td>7</td><td>5</td><td>5</td><td>0</td></tr>
+<tr><td>Website flood (netcat)</td><td>5</td><td>5</td><td>5</td><td>0</td></tr>
+<tr class="miss"><td>Slow scan, Rule 1 only</td><td>1</td><td>5</td><td>0</td><td>5</td></tr>
+<tr><td>Slow scan, Rules 1 + 6</td><td>6</td><td>5</td><td>5</td><td>0</td></tr></table>
+<div class="kpi"><div><div class="n">5 / 5</div><div class="l">every attack, once the rules were tuned</div></div>
+<div><div class="n r">4</div><div class="l">false alarms in 1,368 normal visits (0.3%), all Rule 5</div></div>
+<div><div class="n">~204</div><div class="l">alerts from one NULL + Xmas run: we counted runs, not alerts</div></div></div></div>
+
+<div class="ex"><h3>What we found</h3>
+<div class="find">
+<div class="g"><b>Caught: anything that looks different</b><span>Strange flags, many doors, many logins, many visits, big transfers. Even encrypted SSH: Suricata cannot read it, but it can count and measure it.</span></div>
+<div class="o"><b>Missed: the slow scan</b><span>One knock every 15 s never reaches 20 in 10 s, so Rule 1 saw nothing (0/5). Rule 6 with a 90 s window fixed it (5/5). A slower attacker would still escape.</span></div>
+<div class="r"><b>Wrongly flagged: our normal user</b><span>3 quick visits looked like a flood. Suricata sees behavior, not intent. 0.3% sounds small, but on a site with a million visits it is about 3,000 false alarms a day.</span></div>
+<div class="k"><b>The silent failure</b><span>The 20 MB copy first raised <strong>no alert at all</strong>: Suricata only saw 75–483 KB because packets were dropped before any rule. Nothing warned us. A bigger capture buffer fixed it (21 MB seen, 5/5).</span></div></div></div>
+
+<div class="ex"><h3>Lessons</h3>
+<div class="big3"><div><b>A quiet IDS is not a safe network</b><span>No alert can mean it saw nothing. Check its own counters (packets seen and dropped).</span></div>
+<div><b>Every time window can be beaten</b><span>Rules count inside a window; a patient attacker stays under it.</span></div>
+<div><b>Fix the rule, not the user</b><span>When the normal user was flagged, we changed the rule, and measured the right thing (total bytes, not packet size).</span></div></div>
+<p class="note" style="margin:12px 0 0">Limits: 5 runs per attack, one laptop, one simple normal user. These are patterns, not statistics. The interactive panel and the responder were added after the report, for the demo.</p></div>`;
+sec.insertBefore(pRes,$("p-scripts"));
+function showTab(name){document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.p===name));document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+name));}
+[bStart,bRes].forEach(b=>b.onclick=()=>showTab(b.dataset.p));
+document.querySelectorAll(".tab").forEach(t=>{if(t!==bStart&&t!==bRes){const old=t.onclick;t.onclick=()=>{old&&old();showTab(t.dataset.p);};}});
+showTab("start");
+
+/* ---------- live hooks ---------- */
+const cnt={r1:0,r2:0,r5:0,r6:0};
+const _setM=setM;setM=function(id,n,max){_setM(id,n,max);const k={m1:"r1",m2:"r2",m5:"r5",m6:"r6"}[id];if(k){cnt[k]=n;liveCounts();}};
+const cap=(n,m)=>n>m?m+"+":n;
+function liveCounts(){
+ if(cnt.r5>0){exTrack("web",1,"your visits, last 10 s: <b>"+cap(cnt.r5,4)+" / 4</b>",cnt.r5>=4?"alert":"done");exTrack("flood",1,"connections, last 10 s: <b>"+cap(cnt.r5,4)+" / 4</b>",cnt.r5>=4?"alert":"done");}
+ if(cnt.r1>0||cnt.r6>0)exTrack("scan",1,"Rule 1: <b>"+cap(cnt.r1,20)+" / 20</b> in 10 s<br>Rule 6: <b>"+cap(cnt.r6,4)+" / 4</b> in 90 s",(cnt.r1>=20||cnt.r6>=4)?"alert":"done");
+ if(cnt.r2>0)exTrack("ssh",1,"logins on door 22, last 10 s: <b>"+cap(cnt.r2,5)+" / 5</b>",cnt.r2>=5?"alert":"done");}
+$("site").addEventListener("load",()=>{if(typeof curPage==="string")exTrack("web",0,"page: "+curPage);});
+const _scan=scan;scan=async function(m){exReset("scan");exTrack("scan",0,m==="fast"?"fast: doors 1–1000 in seconds":"slow: one knock every 15 s");return _scan(m);};
+const _send=sendPacket;sendPacket=async function(){exReset("pkt");const f=[...flags];const k=f.sort().join("+")||"no flags";
+ st.pkt={k:k};exTrack("pkt",0,"flags: <b>"+k+"</b>");await _send();exTrack("pkt",1,"to door "+$("pport").value);exTrack("pkt",2,f.length===0?"no flags at all: never normal":(k==="FIN+PSH+URG"?"FIN + PSH + URG: never normal":(k==="SYN"?"SYN only: a normal hello":"unusual mix")));
+ setTimeout(()=>{if(st.pkt&&st.pkt.k===k&&!st.pkt.alerted)exTrack("pkt",3,k==="SYN"?"no alert: this is a normal packet":"no alert: none of our rules matches this mix","safe");},4000);};
+const _login=login;login=async function(pw){if(!pw)return;exTrack("ssh",0,"last try: <b>"+String(pw).replace(/</g,"&lt;")+"</b>");await _login(pw);if(loggedIn)exTrack("ssh",4,"logged in as labuser: you can now steal the file","safe");};
+const _hydra=hydra;hydra=async function(){exTrack("ssh",0,"Hydra is trying the password list");return _hydra();};
+const _steal=steal;steal=async function(){exReset("steal");st.steal={};exTrack("steal",0,"copying customers_database.sql");return _steal();};
+const _drawSteal=drawSteal;drawSteal=function(s){_drawSteal(s);if(!st.steal)return;const mb=(s.bytes/1048576).toFixed(1);
+ if(s.running)exDetail("steal",0,"copying… <b>"+mb+" MB</b> of 20 MB");
+ if(s.bytes>1048576&&!st.steal.p1){st.steal.p1=1;exTrack("steal",1,"more than 1 MB has left","alert");}
+ if(!s.running&&(s.error||s.done)&&!st.steal.end){st.steal.end=1;if(s.blocked)exTrack("steal",4,"stopped at <b>"+mb+" MB</b> of 20 MB","safe");else if(s.done)exTrack("steal",4,"not stopped: all 20 MB stolen (is the defender on?)","alert");else exTrack("steal",4,String(s.error).replace(/</g,"&lt;"),"alert");}};
+const _flood=doFlood;doFlood=async function(){exReset("flood");const n=$("fn").value;st.flood={};exTrack("flood",0,"<b>"+n+"</b> connections at the same moment");await _flood();if(+n<4)setTimeout(()=>{if(!st.flood||!st.flood.alerted)exTrack("flood",2,"no alert: under the limit of 4","safe");},4000);};
+const SID={1000001:[["scan",2,"Rule 1: fast port scan"]],1000006:[["scan",2,"Rule 6: slow scan"]],1000003:[["pkt",3,"Rule 3: NULL packet"]],1000004:[["pkt",3,"Rule 4: Xmas packet"]],
+ 1000002:[["ssh",2,"Rule 2: 5 tries in 10 s"]],1000007:[["steal",2,"Rule 7: more than 1 MB"]],1000005:[["web",2,"Rule 5: 4 visits in 10 s"],["flood",2,"Rule 5: 4 connections in 10 s"]]};
+const BLK={1000001:["scan",3],1000006:["scan",3],1000003:["pkt",4],1000004:["pkt",4],1000002:["ssh",3],1000007:["steal",3],1000005:["web",3]};
+const _add=addAlert;addAlert=function(a){_add(a);if(a.who!=="you")return;(SID[a.sid]||[]).forEach(([k,i,t])=>{exTrack(k,i,t+" · "+tm(a.ts),"alert");if(k==="pkt")st.pkt&&(st.pkt.alerted=1);if(k==="flood"){st.flood=st.flood||{};st.flood.alerted=1;}});};
+let seenBlock=0;const _dd=drawDefense;drawDefense=function(d){_dd(d);const mine=d&&d.blocks&&d.blocks[me];if(mine&&mine.since!==seenBlock){seenBlock=mine.since;const b=BLK[mine.sid];
+ if(b){exTrack(b[0],b[1],"firewall drops all your traffic for "+(mine.left!=null?(mine.left+1)+" s":"a while"),"alert");if(mine.sid===1000005)exTrack("flood",3,"firewall drops all your traffic","alert");}}
+ if(mine&&mine.left!=null){const b=BLK[mine.sid];if(b)exDetail(b[0],b[1],"firewall drops all your traffic · <b>"+mine.left+" s left</b>");}};
+})();
+</script>
+
+</body></html>

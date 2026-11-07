@@ -1,0 +1,104 @@
+=== Evasion test (slow+fragmented scan) run 2: 2026-10-28T13:27:14Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 13:27 +0000
+Nmap scan report for target (172.27.0.2)
+Host is up (0.00062s latency).
+rDNS record for 172.27.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1B:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 256.04 seconds
+=== end run 2 ===
+=== Evasion test (slow+fragmented scan) run 3: 2026-10-28T13:31:50Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 13:31 +0000
+Nmap scan report for target (172.27.0.2)
+Host is up (0.00043s latency).
+rDNS record for 172.27.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1B:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.91 seconds
+=== end run 3 ===
+=== Evasion test (slow+fragmented scan) run 4: 2026-10-28T13:36:26Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 13:36 +0000
+Nmap scan report for target (172.27.0.2)
+Host is up (0.0013s latency).
+rDNS record for 172.27.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1B:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.98 seconds
+=== end run 4 ===
+=== Evasion test (slow+fragmented scan) run 5: 2026-10-28T13:41:03Z ===
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-10-28 13:41 +0000
+Nmap scan report for target (172.27.0.2)
+Host is up (0.0012s latency).
+rDNS record for 172.27.0.2: ids-lab-target-1.ids-lab_lab
+
+PORT   STATE  SERVICE
+1/tcp  closed tcpmux
+2/tcp  closed compressnet
+3/tcp  closed compressnet
+4/tcp  closed unknown
+5/tcp  closed rje
+6/tcp  closed unknown
+7/tcp  closed echo
+8/tcp  closed unknown
+9/tcp  closed discard
+10/tcp closed unknown
+11/tcp closed systat
+12/tcp closed unknown
+13/tcp closed daytime
+14/tcp closed unknown
+15/tcp closed netstat
+MAC Address: 02:42:AC:1B:00:02 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 255.47 seconds
+=== end run 5 ===
